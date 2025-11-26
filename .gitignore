@@ -1,0 +1,4 @@
+.env
+browser_profiles/
+logs_and_runs/
+mumbai_hacks_venv/
