@@ -13,22 +13,26 @@ async def main():
    # Create LangChain PromptTemplate for Royal Sundaram insurance quote task
    insurance_prompt_template = PromptTemplate(
       input_variables=["username", "password"],
-      template="""1. Navigate to Login to 'https://www.royalsundaram.in/MOPIS/Login.jsp', and then enter username and password, user name is {username} password is {password}, click on sign in after both username and password are entered
-      2. From dashboard, click 'Rating Calculator' in side menu
-      3. Select 'New Business' icon under 'Type of Policy' and choose 'Private Car passenger' in the list of options present below
-      4. Click on 'Private Car' icon under the 'click tick done' title
-      5. On the 'Car Insurance in a few steps' box, enter vehicle number MH02FR1294 and click on 'get started', note that there are 4 text boxes for the vehicle number input, add MH to first, 02 to the next one and so on
-      6. Click Proceed on the popup that follows, do this for any popups that come up.
-      7. On the Policy details page, scroll down to the 'Previous Insurance and Pre Inspection Details', and set yesterday's date under 'Previous Policy Expiry Date' (Today's date is {today_date}). Once the date is set, click 'next'.
-      8. On The side menu that shows up, click on 'proceed'. Say yes to any popups that come up.
-      9. On the vpc_comprehensive page, set distance to 'unlimited km', click on calculate / recalculate button, and then Click on the 'Freeze Quote Button, once it turns to blue.
-      10. On the side menu that comes up, enter name 'ketan', last name: 'k', whatsapp number: '9999999999', and click on submit.
-      11.⁠click on 'policy documents' dropdown, and choose 'print quote' option. The quote file should now be on a different tab. Download the quote and save it to a file called 'quote.pdf'""",
+      template="""Goal: Fetching Vehicle Premium value.
+      1. Log into https://smartzone.reliancegeneral.co.in/Login/IMDLogin . Fill username: {username}, and password: {password}. Also fill the CAPTCHA value based on the image you see above it. Once done, click on the circular 'LOGIN' button. You may retry the captcha by clicking on 'refresh symbol' if you fail.
+      2. Once the dashboard loads, hover on the green, round button with a car logo, labelled 'motor'. It is present on the blue dashboard with similar buttons next to it. In the dropdown labelled 'quote', select 'private car'.
+      3. Under the menu named 'vehicle details', enter MH02FR1294 as registration number (spaced as MH 02 FR 1294), click on the 'fetch vehicle details' button.
+      4. Once details have been automatically filled, enter the following fields down the menu - 
+         i. select February under 'select month' dropdown in Manufacturing year and month.
+      ii. select 'short term' under 'Period Of Previous Policy'.
+      iii. The 'Previous Policy Start Date' is 25/02/2021, and the 'Previous Policy End Date' is 15/04/2021
+      iv. select 'yes' for 'Vehicle Ownership Transfer done in previous year policy'.
+      v. check on 'NCB Eligibility Criteria' (this opens more elements)
+      vi. 'claim on last policy' : no
+      vii. 'last year ncb': 35%.
+      5. Click 'get coverage details' and wait for the next form to load.
+      5. In the menu named 'Cover Details', scroll down and click on 'calculate premium'. Fetch the value that comes up.
+      """,
 )
 
    # Populate with dummy values
    task = insurance_prompt_template.format(
-      username="invictus_insurance", password="SundaramRoyal&323", today_date=datetime.now().strftime("%Y-%m-%d")
+      username="Quotation", password="c@40k2kj"
    )
 
    # llm = AzureChatOpenAI(
