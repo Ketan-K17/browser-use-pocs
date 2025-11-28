@@ -100,7 +100,7 @@ insurance_prompt_template = PromptTemplate(
    4. Click on 'Private Car' icon under the 'click tick done' title. Wait for 10 seconds.
    5. On the 'Car Insurance in a few steps' box, enter vehicle number {registration_number} and click on 'get started', note that there are 4 text boxes for the vehicle number input, add MH to first, 02 to the next one and so on. Once done, wait for 10 seconds.
    6. Click Proceed on the popup that follows, do this for any popups that come up.
-   7. On the Policy details page, scroll down to the 'Previous Insurance and Pre Inspection Details', and set date under 'Previous Policy Expiry Date' as 7/11/2025.
+   7. On the Policy details page, scroll down to the 'Previous Insurance and Pre Inspection Details', and set date under 'Previous Policy Expiry Date' as 7/11/2025. DO NOT touch any other elements
    8. Only Once the date is set, click 'next'. Wait for 10 seconds.
    9. On The side menu that shows up, click on 'proceed'. Say yes to any popups that come up.
    10. On the vpc_comprehensive page, set distance to 'unlimited km', wait for 10 seconds.
