@@ -100,14 +100,14 @@ insurance_prompt_template = PromptTemplate(
    4. Click on 'Private Car' icon under the 'click tick done' title. Wait for 10 seconds.
    5. On the 'Car Insurance in a few steps' box, enter vehicle number {registration_number} and click on 'get started', note that there are 4 text boxes for the vehicle number input, add MH to first, 02 to the next one and so on. Once done, wait for 10 seconds.
    6. Click Proceed on the popup that follows, do this for any popups that come up.
-   7. On the Policy details page, scroll down to the 'Previous Insurance and Pre Inspection Details', and set yesterday's date under 'Previous Policy Expiry Date' (Today's date is {today_date}). Note that you will need to interact with a date-picker for the same. Verify if your date has been added properly once you've chosen the date, and the date-picker element has vanished. Only Once the date is set, click 'next'. Wait for 10 seconds.
-   8. On The side menu that shows up, click on 'proceed'. Say yes to any popups that come up.
-   9. On the vpc_comprehensive page, set distance to 'unlimited km', wait for 10 seconds.
-   10. click on calculate / recalculate button. Wait for 10 seconds. 
-   11. click on the 'Freeze Quote Button, once it turns to blue.
-   12. On the side menu that comes up, enter name '{first_name}', last name: '{last_name}', whatsapp number: '{whatsapp_number}', and click on submit. wait for 10 seconds.
-   13.⁠click on 'policy documents' dropdown, and choose 'print quote' option. The quote file should now be on a different tab. 
-   14. Find the download button at the top right of the window, click on it.'""",
+   7. On the Policy details page, scroll down to the 'Previous Insurance and Pre Inspection Details', and set date under 'Previous Policy Expiry Date' as 7/11/2025.
+   8. Only Once the date is set, click 'next'. Wait for 10 seconds.
+   9. On The side menu that shows up, click on 'proceed'. Say yes to any popups that come up.
+   10. On the vpc_comprehensive page, set distance to 'unlimited km', wait for 10 seconds.
+   11. click on calculate / recalculate button. Wait for 10 seconds. 
+   12. click on the 'Freeze Quote Button, once it turns to blue.
+   13. On the side menu that comes up, enter name '{first_name}', last name: '{last_name}', whatsapp number: '{whatsapp_number}', and click on submit. wait for 10 seconds.
+   14.⁠click on 'policy documents' dropdown, and choose 'print quote' option. The quote file should now be on a different tab.""",
 )
 
 # Universal values (shared across all records)
@@ -119,8 +119,8 @@ UNIVERSAL_VALUES = {
 
 # Record-specific values - each dict should contain keys matching the prompt template placeholders
 RECORDS = [
-   {"registration_number": "MH02FR1294", "first_name": "ketan", "last_name": "k", "whatsapp_number": "9999999999", "cred": os.getenv("BU_API_KEY1")},
-   {"registration_number": "MH02FR1294", "first_name": "john", "last_name": "d", "whatsapp_number": "8888888888", "cred": os.getenv("BU_API_KEY2")},
+   {"registration_number": "MH02FR1294", "first_name": "ketan", "last_name": "k", "whatsapp_number": "9999999999", "cred": os.getenv("BU_API_KEY2")},
+   # {"registration_number": "MH02FR1294", "first_name": "john", "last_name": "d", "whatsapp_number": "8888888888", "cred": os.getenv("BU_API_KEY2")},
    # Add more records as needed
 ]
 
@@ -164,8 +164,9 @@ async def fetch_quote(record: dict, profile_id: int, prompt_template: PromptTemp
    
    # Run agent with stuck detection callback
    history = await agent.run(on_step_end=on_step_end_callback)
-   
+
    return identifier, history.final_result()
+
 
 
 async def main():
