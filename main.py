@@ -7,6 +7,8 @@ import sys
 import os
 from datetime import datetime
 from collections import Counter
+from aioconsole import ainput
+
 load_dotenv()
 
 
@@ -14,7 +16,7 @@ load_dotenv()
 # STUCK DETECTION LOGIC
 # ============================================================================
 
-def is_agent_stuck(agent: Agent, repeat_threshold: int = 4, step_threshold: int = 4) -> bool:
+def is_agent_stuck(agent: Agent, identifier: str, repeat_threshold: int = 4, step_threshold: int = 4) -> bool:
     """
     Detect if agent is stuck based on action patterns.
     
@@ -50,7 +52,7 @@ def is_agent_stuck(agent: Agent, repeat_threshold: int = 4, step_threshold: int 
     action_counts = Counter(recent_actions)
     for action_sig, count in action_counts.items():
         if count >= repeat_threshold:
-            print(f"    [Stuck Detection] Action '{action_sig}' repeated {count} times")
+            print(f"    [{identifier}] [Stuck Detection] Action '{action_sig}' repeated {count} times")
             return True
     
     # Check 2: Same goal for too many steps
@@ -62,27 +64,27 @@ def is_agent_stuck(agent: Agent, repeat_threshold: int = 4, step_threshold: int 
                 recent_goals.append(current_state.next_goal)
     
     if len(recent_goals) >= step_threshold and len(set(recent_goals)) == 1:
-        print(f"    [Stuck Detection] Same goal for {step_threshold} consecutive steps: '{recent_goals[0][:50]}...'")
+        print(f"    [{identifier}] [Stuck Detection] Same goal for {step_threshold} consecutive steps")
         return True
     
     return False
 
 
-async def on_step_end_with_stuck_detection(agent: Agent):
+async def on_step_end_with_stuck_detection(agent: Agent, identifier: str):
     """
     Callback that runs after each step to check if agent is stuck.
     If stuck, pauses execution and waits for manual intervention.
     """
-    if is_agent_stuck(agent):
+    if is_agent_stuck(agent, identifier):
         print("\n" + "="*60)
-        print("⚠️  AGENT APPEARS STUCK (repeating actions or no progress)")
+        print(f"⚠️  [{identifier}] AGENT APPEARS STUCK")
         print("="*60)
-        print("Browser is open for manual intervention.")
+        print(f"Profile: {identifier} - Browser is open for manual intervention.")
         print("Please fix the issue in the browser window, then press Enter to continue...")
         print("="*60 + "\n")
         
-        # Block until user presses Enter
-        input("Press Enter after fixing the issue to resume agent execution...")
+        # Use async input to avoid blocking other agents
+        await ainput("Press Enter after fixing the issue to resume agent execution...")
         
         print("\n▶️  Resuming agent execution...\n")
 
@@ -117,8 +119,8 @@ UNIVERSAL_VALUES = {
 
 # Record-specific values - each dict should contain keys matching the prompt template placeholders
 RECORDS = [
-   {"registration_number": "MH02FR1294", "first_name": "ketan", "last_name": "k", "whatsapp_number": "9999999999"}
-   # {"registration_number": "MH02FR1294", "first_name": "john", "last_name": "d", "whatsapp_number": "8888888888"},
+   {"registration_number": "MH02FR1294", "first_name": "ketan", "last_name": "k", "whatsapp_number": "9999999999", "cred": os.getenv("BU_API_KEY1")},
+   {"registration_number": "MH02FR1294", "first_name": "john", "last_name": "d", "whatsapp_number": "8888888888", "cred": os.getenv("BU_API_KEY2")},
    # Add more records as needed
 ]
 
@@ -140,6 +142,8 @@ async def fetch_quote(record: dict, profile_id: int, prompt_template: PromptTemp
    
    # Format the task using the prompt template
    task = prompt_template.format(**all_values)
+
+   identifier = f"{record.get('first_name', 'unknown')}_{record.get('registration_number', f'record_{profile_id}')}"
    
    # Create isolated browser instance for this task
    # keep_alive=True ensures browser stays open during manual intervention pauses
@@ -151,14 +155,16 @@ async def fetch_quote(record: dict, profile_id: int, prompt_template: PromptTemp
    )
 
    agent = Agent(
-      task=task, browser=browser, llm=ChatBrowserUse(), use_vision=True, flash_mode=True
+      task=task, browser=browser, llm=ChatBrowserUse(api_key=record.get("cred")), use_vision=True, use_thinking=True
    )
+
+   # Create a closure that includes the identifier
+   async def on_step_end_callback(agent: Agent):
+      await on_step_end_with_stuck_detection(agent, identifier)
    
    # Run agent with stuck detection callback
-   history = await agent.run(on_step_end=on_step_end_with_stuck_detection)
+   history = await agent.run(on_step_end=on_step_end_callback)
    
-   # Use registration_number as identifier if available, otherwise use profile_id
-   identifier = record.get("registration_number", f"record_{profile_id}")
    return identifier, history.final_result()
 
 
